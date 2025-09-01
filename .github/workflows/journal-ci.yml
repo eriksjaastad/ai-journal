@@ -1,0 +1,39 @@
+name: journal-ci
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'entries/**'
+      - '.github/workflows/journal-ci.yml'
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install python-frontmatter pyyaml
+
+      - name: Generate pretty files + index
+        run: |
+          python scripts/journal_build.py
+
+      - name: Commit changes
+        run: |
+          git config user.name  "journal-bot"
+          git config user.email "journal-bot@users.noreply.github.com"
+          git add -A
+          git diff --staged --quiet || git commit -m "journal-ci: prettify & index"
+          git push
