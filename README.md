@@ -30,4 +30,4 @@ Each entry should include:
 
 ---
 
-*Started: $(date +%Y-%m-%d)*
+*Started: 2025-08-31*
